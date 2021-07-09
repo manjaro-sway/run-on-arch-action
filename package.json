@@ -6,7 +6,7 @@
   "license": "BSD-3-Clause",
   "main": "src/run-on-arch.ts",
   "scripts": {
-    "build": "ncc build --license LICENSE"
+    "build": "ncc build --source-map --license LICENSE && cp -r assets dist/"
   },
   "dependencies": {
     "@actions/core": "^1.4.0",

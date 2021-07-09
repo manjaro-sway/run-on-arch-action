@@ -1,11 +1,11 @@
-import core from "@actions/core";
+import * as core from "@actions/core";
 import fs from "fs";
 import path from "path";
 import shlex from "shlex";
 import { exec } from "@actions/exec";
 
 function slug(str: string) {
-  return str.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+  return str.replace(/[^\w\s]/gi, "-").replace(' ','-').toLowerCase();
 }
 
 const platforms = [
@@ -21,7 +21,7 @@ type Platform = typeof platforms[number];
 
 const assetsDir = path.join(__dirname, "assets");
 
-async function main() {
+const main = async () => {
   const platform = core.getInput("platform", { required: true }) as Platform;
   if (!platforms.includes(platform))
     throw new Error(`${platform} is not a supported platform yet`);
@@ -30,8 +30,6 @@ async function main() {
 
   // pull docker image first so we know if this just doesn't exist
   await exec(`docker pull --platform ${platform} ${baseImage}`);
-
-  //
 
   // Write setup commands to a script file for sourcing
   const setup = core.getInput("setup");
@@ -77,20 +75,21 @@ async function main() {
     ].join("-")
   );
 
+  console.log(containerName);
+
   console.log("Configuring Docker for multi-architecture support");
 
-  await exec(
-    path.join(assetsDir, "run-on-arch.sh"),
-    [baseImage, containerName, platform, ...dockerRunArgs],
-    {
-      env: {
-        ...process.env,
-        GITHUB_TOKEN: githubToken ?? process.env.GITHUB_TOKEN,
-      } as Record<string, string>,
-    }
-  );
-}
+  await exec(path.join(assetsDir, "run-on-arch.sh"), [...dockerRunArgs], {
+    env: {
+      ...process.env,
+      GITHUB_TOKEN: githubToken ?? process.env.GITHUB_TOKEN,
+      BASE_IMAGE: baseImage,
+      CONTAINER_NAME: containerName,
+      DOCKER_PLATFORM: platform,
+    } as Record<string, string>,
+  });
+};
 
 main().catch((err) => {
-  core.setFailed(err.message);
+  core.setFailed(err);
 });

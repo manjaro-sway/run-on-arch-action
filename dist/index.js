@@ -1,4 +1,4 @@
-/******/ (() => { // webpackBootstrap
+require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
@@ -2239,7 +2239,7 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
 
 
 function slug(str) {
-    return str.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+    return str.replace(/[^\w\s]/gi, "-").replace(' ', '-').toLowerCase();
 }
 var platforms = [
     "linux/amd64",
@@ -2250,59 +2250,58 @@ var platforms = [
     "linux/s390x",
 ];
 var assetsDir = path__WEBPACK_IMPORTED_MODULE_2___default().join(__dirname, "assets");
-function main() {
-    return __awaiter(this, void 0, void 0, function () {
-        var platform, baseImage, setup, shell, installScript, commands, dockerRunArgs, githubToken, containerName;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    platform = _actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("platform", { required: true });
-                    if (!platforms.includes(platform))
-                        throw new Error(platform + " is not a supported platform yet");
-                    baseImage = _actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("image", { required: true });
-                    // pull docker image first so we know if this just doesn't exist
-                    return [4 /*yield*/, (0,_actions_exec__WEBPACK_IMPORTED_MODULE_4__.exec)("docker pull --platform " + platform + " " + baseImage)];
-                case 1:
-                    // pull docker image first so we know if this just doesn't exist
-                    _a.sent();
-                    setup = _actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("setup");
-                    fs__WEBPACK_IMPORTED_MODULE_1___default().writeFileSync(path__WEBPACK_IMPORTED_MODULE_2___default().join(assetsDir, "run-on-arch-setup.sh"), setup);
-                    shell = _actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("shell", { required: true });
-                    installScript = [
-                        "#!/bin/" + shell,
-                        "set -eu;",
-                        "export DEBIAN_FRONTEND=noninteractive;",
-                        _actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("install"),
-                    ].join("\n");
-                    fs__WEBPACK_IMPORTED_MODULE_1___default().writeFileSync(path__WEBPACK_IMPORTED_MODULE_2___default().join(assetsDir, "run-on-arch-install.sh"), installScript);
-                    commands = [
-                        "#!" + shell,
-                        "set -eu;",
-                        _actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("run", { required: true }),
-                    ].join("\n");
-                    fs__WEBPACK_IMPORTED_MODULE_1___default().writeFileSync(path__WEBPACK_IMPORTED_MODULE_2___default().join(assetsDir, "run-on-arch-commands.sh"), commands);
-                    dockerRunArgs = shlex__WEBPACK_IMPORTED_MODULE_3__.split(_actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("dockerRunArgs"));
-                    githubToken = _actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("githubToken");
-                    containerName = slug([
-                        "run-on-arch",
-                        process.env.GITHUB_REPOSITORY,
-                        process.env.GITHUB_WORKFLOW,
-                        platform,
-                        baseImage,
-                    ].join("-"));
-                    console.log("Configuring Docker for multi-architecture support");
-                    return [4 /*yield*/, (0,_actions_exec__WEBPACK_IMPORTED_MODULE_4__.exec)(path__WEBPACK_IMPORTED_MODULE_2___default().join(assetsDir, "run-on-arch.sh"), __spreadArray([baseImage, containerName, platform], dockerRunArgs), {
-                            env: __assign(__assign({}, process.env), { GITHUB_TOKEN: githubToken !== null && githubToken !== void 0 ? githubToken : process.env.GITHUB_TOKEN }),
-                        })];
-                case 2:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
+var main = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var platform, baseImage, setup, shell, installScript, commands, dockerRunArgs, githubToken, containerName;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                platform = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("platform", { required: true });
+                if (!platforms.includes(platform))
+                    throw new Error(platform + " is not a supported platform yet");
+                baseImage = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("image", { required: true });
+                // pull docker image first so we know if this just doesn't exist
+                return [4 /*yield*/, (0,_actions_exec__WEBPACK_IMPORTED_MODULE_4__.exec)("docker pull --platform " + platform + " " + baseImage)];
+            case 1:
+                // pull docker image first so we know if this just doesn't exist
+                _a.sent();
+                setup = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("setup");
+                fs__WEBPACK_IMPORTED_MODULE_1___default().writeFileSync(path__WEBPACK_IMPORTED_MODULE_2___default().join(assetsDir, "run-on-arch-setup.sh"), setup);
+                shell = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("shell", { required: true });
+                installScript = [
+                    "#!/bin/" + shell,
+                    "set -eu;",
+                    "export DEBIAN_FRONTEND=noninteractive;",
+                    _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("install"),
+                ].join("\n");
+                fs__WEBPACK_IMPORTED_MODULE_1___default().writeFileSync(path__WEBPACK_IMPORTED_MODULE_2___default().join(assetsDir, "run-on-arch-install.sh"), installScript);
+                commands = [
+                    "#!" + shell,
+                    "set -eu;",
+                    _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("run", { required: true }),
+                ].join("\n");
+                fs__WEBPACK_IMPORTED_MODULE_1___default().writeFileSync(path__WEBPACK_IMPORTED_MODULE_2___default().join(assetsDir, "run-on-arch-commands.sh"), commands);
+                dockerRunArgs = shlex__WEBPACK_IMPORTED_MODULE_3__.split(_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("dockerRunArgs"));
+                githubToken = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("githubToken");
+                containerName = slug([
+                    "run-on-arch",
+                    process.env.GITHUB_REPOSITORY,
+                    process.env.GITHUB_WORKFLOW,
+                    platform,
+                    baseImage,
+                ].join("-"));
+                console.log(containerName);
+                console.log("Configuring Docker for multi-architecture support");
+                return [4 /*yield*/, (0,_actions_exec__WEBPACK_IMPORTED_MODULE_4__.exec)(path__WEBPACK_IMPORTED_MODULE_2___default().join(assetsDir, "run-on-arch.sh"), __spreadArray([], dockerRunArgs), {
+                        env: __assign(__assign({}, process.env), { GITHUB_TOKEN: githubToken !== null && githubToken !== void 0 ? githubToken : process.env.GITHUB_TOKEN, BASE_IMAGE: baseImage, CONTAINER_NAME: containerName, DOCKER_PLATFORM: platform }),
+                    })];
+            case 2:
+                _a.sent();
+                return [2 /*return*/];
+        }
     });
-}
+}); };
 main().catch(function (err) {
-    _actions_core__WEBPACK_IMPORTED_MODULE_0___default().setFailed(err.message);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(err);
 });
 
 })();
@@ -2310,3 +2309,4 @@ main().catch(function (err) {
 module.exports = __webpack_exports__;
 /******/ })()
 ;
+//# sourceMappingURL=index.js.map
